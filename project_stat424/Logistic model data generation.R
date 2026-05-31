@@ -1,0 +1,497 @@
+#library(tictoc)
+#library(pryr)
+library(dplyr)
+#library(bench)
+library(peakRAM)
+
+
+
+
+# DRGLM 100
+
+
+set.seed(123)
+
+mc_simulation <- function() {
+
+  nobs <- 5000000
+
+  x1 <- runif(nobs)
+  x2 <- runif(nobs)
+  x3 <- runif(nobs)
+  x4 <- runif(nobs)
+  x5 <- runif(nobs)
+  x6 <- runif(nobs)
+  x7 <- runif(nobs)
+  x8 <- runif(nobs)
+  x9 <- runif(nobs)
+  x10 <- runif(nobs)
+
+  b <- c(2, .75, -1.25, .5, .6, 1.45, -.4, 1.95, .55, 1.10, -.80)
+
+  X <- cbind(1, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+  eta <- X %*% b
+
+  inv.logit <- function(p) {
+    exp(p) / (1 + exp(p))
+  }
+
+  y <- rbinom(nobs, 1, inv.logit(eta))
+
+  data <- data.frame(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+
+  ram_result <- peakRAM({
+    model_drglm <- drglm(
+      y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10,
+      family = "binomial",
+      data = data,
+      k = 100,
+      fitfunction = "glm"
+    )
+  })
+  
+  time <- ram_result$Elapsed_Time_sec
+  memory <- ram_result$Peak_RAM_Used_MiB / 1024
+
+  pr <- sum(drglm_residuals(model_drglm, type = "pearson")^2)
+  prdisp <- pr / model_drglm$df.residual
+  beta <- model_drglm$coefficients
+  se <- model_drglm$Estimates[, "standard error"]
+
+  list(
+    beta = beta,
+    se = se,
+    prdisp = prdisp,
+    time = time,
+    memory = memory
+  )
+}
+
+B2_logistic <- replicate(500, mc_simulation(), simplify = FALSE)
+# save(B2_logistic, file = "B2_logistic.RData")
+# 
+
+
+# DRGLM 50
+
+
+set.seed(123)
+
+mc_simulation <- function() {
+
+  nobs <- 5000000
+
+  x1 <- runif(nobs)
+  x2 <- runif(nobs)
+  x3 <- runif(nobs)
+  x4 <- runif(nobs)
+  x5 <- runif(nobs)
+  x6 <- runif(nobs)
+  x7 <- runif(nobs)
+  x8 <- runif(nobs)
+  x9 <- runif(nobs)
+  x10 <- runif(nobs)
+
+  b <- c(2, .75, -1.25, .5, .6, 1.45, -.4, 1.95, .55, 1.10, -.80)
+
+  X <- cbind(1, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+  eta <- X %*% b
+
+  inv.logit <- function(p) {
+    exp(p) / (1 + exp(p))
+  }
+
+  y <- rbinom(nobs, 1, inv.logit(eta))
+
+  data <- data.frame(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+
+  ram_result <- peakRAM({
+    model_drglm <- drglm(
+      y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10,
+      family = "binomial",
+      data = data,
+      k = 50,
+      fitfunction = "glm"
+    )
+  })
+  
+  time <- ram_result$Elapsed_Time_sec
+  memory <- ram_result$Peak_RAM_Used_MiB / 1024
+
+  pr <- sum(drglm_residuals(model_drglm, type = "pearson")^2)
+  prdisp <- pr / model_drglm$df.residual
+  beta <- model_drglm$coefficients
+  se <- model_drglm$Estimates[, "standard error"]
+
+  list(
+    beta = beta,
+    se = se,
+    prdisp = prdisp,
+    time = time,
+    memory = memory
+  )
+}
+
+B3_logistic <- replicate(500, mc_simulation(), simplify = FALSE)
+#save(B3_logistic, file = "B3_logistic.RData")
+# 
+
+
+# DRGLM 25
+
+
+set.seed(123)
+
+mc_simulation <- function() {
+
+  nobs <- 5000000
+
+  x1 <- runif(nobs)
+  x2 <- runif(nobs)
+  x3 <- runif(nobs)
+  x4 <- runif(nobs)
+  x5 <- runif(nobs)
+  x6 <- runif(nobs)
+  x7 <- runif(nobs)
+  x8 <- runif(nobs)
+  x9 <- runif(nobs)
+  x10 <- runif(nobs)
+
+  b <- c(2, .75, -1.25, .5, .6, 1.45, -.4, 1.95, .55, 1.10, -.80)
+
+  X <- cbind(1, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+  eta <- X %*% b
+
+  inv.logit <- function(p) {
+    exp(p) / (1 + exp(p))
+  }
+
+  y <- rbinom(nobs, 1, inv.logit(eta))
+
+  data <- data.frame(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+
+  ram_result <- peakRAM({
+    model_drglm <- drglm(
+      y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10,
+      family = "binomial",
+      data = data,
+      k = 25,
+      fitfunction = "glm"
+    )
+  })
+  
+  time <- ram_result$Elapsed_Time_sec
+  memory <- ram_result$Peak_RAM_Used_MiB / 1024
+
+  pr <- sum(drglm_residuals(model_drglm, type = "pearson")^2)
+  prdisp <- pr / model_drglm$df.residual
+  beta <- model_drglm$coefficients
+  se <- model_drglm$Estimates[, "standard error"]
+
+  list(
+    beta = beta,
+    se = se,
+    prdisp = prdisp,
+    time = time,
+    memory = memory
+  )
+}
+
+B4_logistic <- replicate(500, mc_simulation(), simplify = FALSE)
+# save(B4_logistic, file = "B4_logistic.RData")
+# 
+
+
+# DRGLM_new 100
+
+
+set.seed(123)
+
+mc_simulation <- function() {
+  
+  nobs <- 5000000
+  
+  x1 <- runif(nobs)
+  x2 <- runif(nobs)
+  x3 <- runif(nobs)
+  x4 <- runif(nobs)
+  x5 <- runif(nobs)
+  x6 <- runif(nobs)
+  x7 <- runif(nobs)
+  x8 <- runif(nobs)
+  x9 <- runif(nobs)
+  x10 <- runif(nobs)
+  
+  b <- c(2, .75, -1.25, .5, .6, 1.45, -.4, 1.95, .55, 1.10, -.80)
+  
+  X <- cbind(1, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+  eta <- X %*% b
+  
+  inv.logit <- function(p) {
+    exp(p) / (1 + exp(p))
+  }
+  
+  y <- rbinom(nobs, 1, inv.logit(eta))
+  
+  data <- data.frame(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+  
+  ram_result <- peakRAM({
+    model_drglm <- drglm_new(
+      y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10,
+      family = "binomial",
+      df = data,
+      k = 100,
+      fitfunction = "glm",
+      shuffle = FALSE
+    )
+  })
+  
+  time <- ram_result$Elapsed_Time_sec
+  memory <- ram_result$Peak_RAM_Used_MiB / 1024
+  
+  
+  pr <- sum(drglm_residuals(model_drglm, type = "pearson")^2)
+  prdisp <- pr / model_drglm$df.residual
+  beta <- model_drglm$coefficients
+  se <- model_drglm$Estimates[, "standard error"]
+  
+  list(
+    beta = beta,
+    se = se,
+    prdisp = prdisp,
+    time = time,
+    memory = memory
+  )
+}
+
+B5_logistic <- replicate(500, mc_simulation(), simplify = FALSE)
+#save(B5_logistic, file = "B5_logistic.RData")
+
+ 
+# DRGLM_new 50
+
+
+set.seed(123)
+
+mc_simulation <- function() {
+  
+  nobs <- 5000000
+  
+  x1 <- runif(nobs)
+  x2 <- runif(nobs)
+  x3 <- runif(nobs)
+  x4 <- runif(nobs)
+  x5 <- runif(nobs)
+  x6 <- runif(nobs)
+  x7 <- runif(nobs)
+  x8 <- runif(nobs)
+  x9 <- runif(nobs)
+  x10 <- runif(nobs)
+  
+  b <- c(2, .75, -1.25, .5, .6, 1.45, -.4, 1.95, .55, 1.10, -.80)
+  
+  X <- cbind(1, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+  eta <- X %*% b
+  
+  inv.logit <- function(p) {
+    exp(p) / (1 + exp(p))
+  }
+  
+  y <- rbinom(nobs, 1, inv.logit(eta))
+  
+  data <- data.frame(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+  
+  ram_result <- peakRAM({
+    model_drglm <- drglm_new(
+      y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10,
+      family = "binomial",
+      df = data,
+      k = 50,
+      fitfunction = "glm",
+      shuffle = FALSE
+    )
+  })
+  
+  time <- ram_result$Elapsed_Time_sec
+  memory <- ram_result$Peak_RAM_Used_MiB / 1024
+  
+  pr <- sum(drglm_residuals(model_drglm, type = "pearson")^2)
+  prdisp <- pr / model_drglm$df.residual
+  beta <- model_drglm$coefficients
+  se <- model_drglm$Estimates[, "standard error"]
+  
+  list(
+    beta = beta,
+    se = se,
+    prdisp = prdisp,
+    time = time,
+    memory = memory
+  )
+}
+
+B6_logistic <- replicate(500, mc_simulation(), simplify = FALSE)
+#save(B6_logistic, file = "B6_logistic.RData")
+
+
+# DRGLM_new 25
+
+
+set.seed(123)
+
+mc_simulation <- function() {
+  
+  nobs <- 5000000
+  
+  x1 <- runif(nobs)
+  x2 <- runif(nobs)
+  x3 <- runif(nobs)
+  x4 <- runif(nobs)
+  x5 <- runif(nobs)
+  x6 <- runif(nobs)
+  x7 <- runif(nobs)
+  x8 <- runif(nobs)
+  x9 <- runif(nobs)
+  x10 <- runif(nobs)
+  
+  b <- c(2, .75, -1.25, .5, .6, 1.45, -.4, 1.95, .55, 1.10, -.80)
+  
+  X <- cbind(1, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+  eta <- X %*% b
+  
+  inv.logit <- function(p) {
+    exp(p) / (1 + exp(p))
+  }
+  
+  y <- rbinom(nobs, 1, inv.logit(eta))
+  
+  data <- data.frame(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+  
+  ram_result <- peakRAM({
+    model_drglm <- drglm_new(
+      y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10,
+      family = "binomial",
+      df = data,
+      k = 25,
+      fitfunction = "glm",
+      shuffle = FALSE
+    )
+  })
+  
+  time <- ram_result$Elapsed_Time_sec
+  memory <- ram_result$Peak_RAM_Used_MiB / 1024
+  
+  pr <- sum(drglm_residuals(model_drglm, type = "pearson")^2)
+  prdisp <- pr / model_drglm$df.residual
+  beta <- model_drglm$coefficients
+  se <- model_drglm$Estimates[, "standard error"]
+  
+  list(
+    beta = beta,
+    se = se,
+    prdisp = prdisp,
+    time = time,
+    memory = memory
+  )
+}
+
+B7_logistic <- replicate(500, mc_simulation(), simplify = FALSE)
+#save(B7_logistic, file = "B7_logistic.RData")
+
+
+
+# GLM
+
+
+set.seed(123)
+
+mc_simulation <- function() {
+  
+  nobs <- 5000000
+  
+  x1 <- runif(nobs)
+  x2 <- runif(nobs)
+  x3 <- runif(nobs)
+  x4 <- runif(nobs)
+  x5 <- runif(nobs)
+  x6 <- runif(nobs)
+  x7 <- runif(nobs)
+  x8 <- runif(nobs)
+  x9 <- runif(nobs)
+  x10 <- runif(nobs)
+  
+  b <- c(2, .75, -1.25, .5, .6, 1.45, -.4, 1.95, .55, 1.10, -.80)
+  
+  X <- cbind(1, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
+  eta <- X %*% b
+  
+  inv.logit <- function(p) {
+    exp(p) / (1 + exp(p))
+  }
+  
+  y <- rbinom(nobs, 1, inv.logit(eta))
+  
+  ram_result <- peakRAM({
+    model_glm <- glm(
+      y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10,
+      family = binomial
+    )
+  })
+  
+  time <- ram_result$Elapsed_Time_sec
+  memory <- ram_result$Peak_RAM_Used_MiB / 1024
+  
+  pr <- sum(residuals(model_glm, type = "pearson")^2)
+  prdisp <- pr / model_glm$df.residual
+  beta <- model_glm$coefficients
+  se <- sqrt(diag(vcov(model_glm)))
+  
+  list(
+    beta = beta,
+    se = se,
+    prdisp = prdisp,
+    time = time,
+    memory = memory
+  )
+}
+
+
+B1_logistic <- replicate(500, mc_simulation(), simplify = FALSE)
+#save(B1_logistic, file = "B1_logistic.RData")
+ 
+
+
+
+
+
+summarize_mc <- function(result_list, method_name) {
+  tibble(
+    Method = method_name,
+    Time = mean(unlist(lapply(result_list, function(df) df$time))),
+    Peak_memory = mean(unlist(lapply(result_list, function(df) df$memory)))
+  )
+}
+
+time_result <- bind_rows(
+  summarize_mc(B1_logistic, "glm"),
+  summarize_mc(B4_logistic, "drglm_k_25"),
+  summarize_mc(B7_logistic, "drglm_new_k_25"),
+  summarize_mc(B3_logistic, "drglm_k_50"),
+  summarize_mc(B6_logistic, "drglm_new_k_50"),
+  summarize_mc(B2_logistic, "drglm_k_100"),
+  summarize_mc(B5_logistic, "drglm_new_k_100")
+)
+
+
+
+base_time <- time_result$Time[time_result$Method == "glm"]
+base_memory <- time_result$Peak_memory[time_result$Method == "glm"]
+
+summary_table <- time_result %>%
+  mutate(
+    Time_change = paste(round((Time - base_time) * 100 / base_time, 3), "%"),
+    Memory_change = paste(round((Peak_memory - base_memory) * 100 / base_memory, 3), "%"),
+    Time = round(Time, 3),
+    Peak_memory = paste(round(Peak_memory, 3), "G")
+  )
+
+summary_table
